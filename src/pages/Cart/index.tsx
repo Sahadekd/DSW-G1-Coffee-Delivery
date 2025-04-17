@@ -92,6 +92,8 @@ export function Cart() {
     return currencyValue + coffee.price * coffee.quantity
   }, 0);
 
+  const total = totalItemsPrice + DELIVERY_PRICE;
+
   function handleItemIncrement(id: string) {
     setCoffeesInCart((prevState) =>
       prevState.map((coffee) => {
@@ -131,6 +133,21 @@ export function Cart() {
     setCoffeesInCart((prevState) =>
       prevState.filter((coffee) => coffee.id !== itemId),
     )
+  }
+
+  function handleFavoriteCoffee(id: string) {
+    setCoffeesInCart((prevState) =>
+      prevState.map((coffee) => {
+        if (coffee.id === id) {
+          return {
+            ...coffee,
+            favorite: !coffee.favorite,
+          }
+        }
+        return coffee
+      }),
+    )
+    
   }
 
   return (
@@ -258,7 +275,7 @@ export function Cart() {
                 {new Intl.NumberFormat('pt-br', {
                   currency: 'BRL',
                   style: 'currency',
-                }).format(totalItemsPrice + (DELIVERY_PRICE * amountTags.length))}
+                  }).format(total)}
               </span>
             </div>
           </CartTotalInfo>

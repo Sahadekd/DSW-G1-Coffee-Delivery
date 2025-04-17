@@ -22,19 +22,30 @@ interface Coffee {
 export function Home() {
   const theme = useTheme();
   const [coffees, setCoffees] = useState<Coffee[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   useEffect(() => {
     async function fetchCoffees() {
-      const response = await api('/coffees');
-      setCoffees(response.data);
-
-      console.log({coffees: response.data});
+      try {
+        const response = await api.get('/coffees');
+        setCoffees(response.data.sort((a, b) => a.title.localeCompare(b.title)));
+      } catch (error) {
+        console.error(error);
+      }
     }
     fetchCoffees();
   }, []);
 
+  useEffect(() => {
+    const uniqueCategories = [...new Set(coffees.flatMap(coffee => coffee.tags))];
+    setCategories(uniqueCategories);
+  }, [coffees]);
 
-  
+  const filteredCoffees = selectedCategory
+    ? coffees.filter(coffee => coffee.tags.includes(selectedCategory))
+    : coffees;
+
   function incrementQuantity(id: string) {
     setCoffees((prevState) =>
       prevState.map((coffee) => {
@@ -146,32 +157,20 @@ export function Home() {
 
         <h2>Nossos cafés</h2>
         <Navbar>
-          <Radio
-            onClick={() => {}}
-            isSelected={false}
-            value="tradicional"
-          >
-            <span>Tradicional</span>
-          </Radio>
-          <Radio
-            onClick={() => {}}
-            isSelected={false}
-            value="gelado"
-          >
-            <span>Gelado</span>
-          </Radio>
-          <Radio
-            onClick={() => {}}
-            isSelected={false}
-            value="com leite"
-          >
-            <span>Com leite</span>
-          </Radio>
+          {categories.map(category => (
+            <Radio
+              key={category}
+              onClick={() => setSelectedCategory(category === selectedCategory ? '' : category)}
+              isSelected={selectedCategory === category}
+              value={category}
+            >
+              <span>{category}</span>
+            </Radio>
+          ))}
         </Navbar>
 
-
         <div>
-          {coffees.map((coffee) => (
+          {filteredCoffees.map((coffee) => (
             <CoffeeCard
               key={coffee.id}
               coffee={coffee}

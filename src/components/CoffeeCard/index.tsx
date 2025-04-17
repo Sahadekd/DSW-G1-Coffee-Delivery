@@ -29,16 +29,12 @@ type CoffeeCardProps = {
   handleFavoriteCoffee: (id: string) => void
 }
 
-export function CoffeeCard({ coffee, incrementQuantity, decrementQuantity }: CoffeeCardProps) {
+export function CoffeeCard({ coffee, incrementQuantity, decrementQuantity, handleFavoriteCoffee }: CoffeeCardProps) {
   const theme = useTheme();
-  /**
-   * Cor brancoa do coração quando o café não é favorito: theme.colors['base-card']
-   * Cor vermelha do coração quando o café é favorito: "red" 
-   * **/
 
   return (
     <Container>
-      <CoffeeImg src={"/images/coffees/expresso-cremoso.png"} alt="Expresso Tradicional" />
+      <CoffeeImg src={coffee.image} alt={coffee.title} />
 
       <Tags>
         {coffee.tags.map((tag) => <span key={tag}>{tag}</span>)}
@@ -54,15 +50,15 @@ export function CoffeeCard({ coffee, incrementQuantity, decrementQuantity }: Cof
           <span>{coffee.price.toFixed(2)}</span> 
         </Price>
 
-        <Order $itemAdded={false}>
+        <Order>
           <QuantityInput
             quantity={coffee.quantity }
             incrementQuantity={() => incrementQuantity(coffee.id)}
             decrementQuantity={() => decrementQuantity(coffee.id)}
           />
 
-          <button onClick={() => {}}>
-            <Heart size={22}  color={theme.colors['base-card']} />
+          <button onClick={() => handleFavoriteCoffee(coffee.id)}>
+            <Heart size={22}  color={coffee.favorite ? 'red' : theme.colors['base-card']} />
           </button>
         </Order>
       </Control>
